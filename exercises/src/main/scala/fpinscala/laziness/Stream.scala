@@ -17,13 +17,52 @@ trait Stream[+A] {
     case Empty => None
     case Cons(h, t) => if (f(h())) Some(h()) else t().find(f)
   }
-  def take(n: Int): Stream[A] = sys.error("todo")
 
-  def drop(n: Int): Stream[A] = sys.error("todo")
+  // Ex. 5.1
+  def toList: List[A] = foldRight[List[A]](Nil) { (a, as) => a::as }
+  // stack-safe solution, see answers
+  def toList2: List[A] = {
+    @annotation.tailrec
+    def go(s: Stream[A], l: List[A]): List[A] = s match {
+      case Empty => l.reverse
+      case Cons(h, t) => go(t(), h()::l)
+    }
+    go(this, Nil)
+  }
 
-  def takeWhile(p: A => Boolean): Stream[A] = sys.error("todo")
+  // Ex. 5.2
+  def take(n: Int): Stream[A] = if (n < 1) Empty else {
+    this match {
+      case Empty => Empty
+      case Cons(h, t) => cons(h(), t().take(n-1))
+  } }
+  def drop(n: Int): Stream[A] = {
+    @annotation.tailrec
+    def go(s: => Stream[A], m: Int): Stream[A] = if (m < 1) s else { s match {
+      case Empty => Empty
+      case Cons(h, t) => go(t(), n-1)
+    } }
+    go(this, n)
+  }
 
-  def forAll(p: A => Boolean): Boolean = sys.error("todo")
+  // Ex. 5.3
+  // better solution from answers: put `Cons` case first, moving predicate check to a case filter
+  def takeWhile(p: A => Boolean): Stream[A] = this match {
+    case Empty => Empty
+    case Cons(h, t) => if (p(h())) cons(h(), t() takeWhile p) else empty
+  }
+
+  // Ex. 5.4
+  @annotation.tailrec
+  final def forAll(p: A => Boolean): Boolean = this match {
+    case Empty => true
+    case Cons(h, t) => p(h()) && (t() forAll p)
+  }
+
+  // Ex. 5.5
+  def takeWhile2(p:A=>Boolean):Stream[A] = foldRight[Stream[A]](Empty) { (a,b) =>
+    if (p(a)) cons(a,b) else Empty
+  }
 
   def startsWith[B](s: Stream[B]): Boolean = sys.error("todo")
 }
