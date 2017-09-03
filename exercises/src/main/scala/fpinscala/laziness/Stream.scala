@@ -123,10 +123,10 @@ trait Stream[+A] {
   } }
 
   // Ex. 5.15
-  // this looks like a more concise solution than the book gives :)
-  def tails: Stream[Stream[A]] = foldRight(cons(empty[A],empty[Stream[A]])) {
-    case (a, b @ Cons(h,_)) => cons(cons(a,h()),b)
-  }
+  def tails: Stream[Stream[A]] = unfold(this) { _ match {
+    case Empty => None
+    case s@Cons(_,t) => Some(s -> t())
+  } }
 
   // Ex. 5.16
   def scanRight[B](z: B)(f: (A, => B) => B): Stream[B] = ??? //TODO
