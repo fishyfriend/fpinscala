@@ -120,7 +120,12 @@ object List { // `List` companion object. Contains functions for creating and wo
   }
 
   // Exercise 3.8
-  // skip
+  // The original list, regardless whether `Nil` or `Cons()`, is returned.
+  // This shows that `foldRight`, when called with `z=Nil` and `f=Cons(_,_)`,
+  // behaves as an identity function for the data constructors of `List`.
+  // Put another way, the function:
+  //   (l:List[A]) => foldRight(l, Nil:List[A])(Cons(_,_))
+  // is an identity function.
 
   // Exercise 3.9
   def length[A](l: List[A]): Int = foldRight(l, 0)((a, n) => 1 + n)
