@@ -157,10 +157,7 @@ object List { // `List` companion object. Contains functions for creating and wo
   def append2[A](a1: List[A], a2: List[A]): List[A] = foldRight(a1, a2)(Cons(_, _))
 
   // Exercise 3.15
-  def flatten[A](l: List[List[A]]): List[A] =
-    foldRight(l, Nil:List[A]) { (a, b) =>
-      foldRight(a, b)(Cons(_, _))
-    }
+  def flatten[A](l: List[List[A]]): List[A] = foldRight(l, Nil:List[A])(append2)
 
   // Exercise 3.16
   def add1(l: List[Int]): List[Int] = foldRight(l, Nil: List[Int])((a,b)=>Cons(a+1,b))
