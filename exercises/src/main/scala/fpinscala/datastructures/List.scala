@@ -185,29 +185,42 @@ object List { // `List` companion object. Contains functions for creating and wo
 
   // Exercise 3.22
   def addEls(l1: List[Int], l2: List[Int]): List[Int] = (l1, l2) match {
-    case (Nil, _) => l2
-    case (_, Nil) => l1
+    case (Nil, _) => l2 // n.b. the text has `Nil` here
+    case (_, Nil) => l1 // and here
     case (Cons(h1, t1), Cons(h2, t2)) => Cons(h1+h2, addEls(t1, t2))
   }
 
   // Exercise 3.23
+  // Text solution is more general: ((List[A], List[B])(f: (A,B)=>C): List[C]
+  // Like the previous exercise, the text solution reverts to `Nil` when one
+  // list runs out of data. That's necessary since there is no result of type
+  // `C` available when only one of the two input values is present. In my
+  // solution, when one list runs out of data, the input value from the other
+  // list is also taken to be the "result" value. That works for e.g. addition
+  // and multiplication but might not be intuitive as a rule. So the text
+  // solution is better for real-word applications.
   def zipWith[A](l1: List[A], l2: List[A])(f: (A, A) => A): List[A] =
     (l1, l2) match {
       case (Nil, _) => l2
       case (_, Nil) => l1
       case (Cons(h1, t1), Cons(h2, t2)) => Cons(f(h1,h2), zipWith(t1,t2)(f))
     }
+  def zipWith2[A,B,C](l1: List[A], l2: List[B])(f: (A, B) => C): List[C] =
+    (l1, l2) match {
+      case (Nil, _) => Nil
+      case (_, Nil) => Nil
+      case (Cons(h1, t1), Cons(h2, t2)) => Cons(f(h1,h2), zipWith2(t1,t2)(f))
+    }
 
   // Exercise 3.24
+  // variation on the text solution
+  @annotation.tailrec
   def hasSubsequence[A](sup: List[A], sub: List[A]): Boolean = {
-    val ls = foldRight(sup, Nil:List[List[A]]) { (a, ls) =>
-      Cons(List(a), map(ls)(Cons(a, _)))
+    def startsWith[A](a:List[A], b:List[A]):Boolean =
+      length(b) == length(filter(zipWith2(a, b)(_ == _))(_ == true))
+    sup match {
+      case Nil => sub == Nil
+      case Cons(_, t) => startsWith(sup, sub) || hasSubsequence(t, sub)
     }
-    foldLeft(ls, false) { (b, l) =>
-      if (b) true
-      else Nil == foldLeft(l, sub) { (toM, a) =>
-        toM match {
-          case Nil => Nil
-          case Cons(x, xs) => if (a == x) xs else sub
-    } } } }
+  }
 }
