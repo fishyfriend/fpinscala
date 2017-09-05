@@ -80,15 +80,20 @@ object List { // `List` companion object. Contains functions for creating and wo
   }
 
   // Exercise 3.6
-  def init[A](l: List[A]): List[A] = l match {
+  def init[A](l: List[A]): List[A] = {
     case Nil => throw new UnsupportedOperationException("can't take init of empty list")
-    case Cons(h, t) =>
-      def go(hh: A, tt: List[A]): List[A] = tt match {
-        case Nil => Nil
-        case Cons(hhh, ttt) => Cons(hh, go(hhh, ttt))
-      }
-      go(h, t)
+    case Cons(h,Nil) => Nil
+    case Cons(h,t) => Cons(h,init(t))
+  }
+  def init2[A](l: List[A]): List[A] = {
+    @annotation.tailrec
+    def go(acc: List[A], l: List[A]): (List[A], List[A]) = l match {
+      case Nil => throw new UnsupportedOperationException("can't take init of empty list")
+      case Cons(_, Nil) => (acc, Nil)
+      case Cons(h, t) => go(Cons(h,acc), t)
     }
+    reverse(go(Nil, l)._1)
+  }
 
   // Exercise 3.7
   // No, because if all the recursive calls to `foldRight` are made before `f` is called
