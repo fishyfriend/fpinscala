@@ -61,9 +61,8 @@ sealed trait Stream[+A] {
   final def forAll2(p: A => Boolean): Boolean = foldRight(true){ (a,b) => p(a) && b }
 
   // Ex. 5.5
-  def takeWhile2(p:A=>Boolean):Stream[A] = foldRight[Stream[A]](Empty) { (a,b) =>
-    if (p(a)) cons(a,b) else Empty
-  }
+  def takeWhile2(p:A=>Boolean):Stream[A] =
+    foldRight[Stream[A]](Empty) { (a,b) => if (p(a)) cons(a,b) else Empty }
 
   // Ex. 5.6
   def headOption: Option[A] = foldRight[Option[A]](None) { (a, b) => Some(a) }
