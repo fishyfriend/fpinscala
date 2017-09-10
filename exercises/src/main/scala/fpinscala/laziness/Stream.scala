@@ -69,22 +69,13 @@ sealed trait Stream[+A] {
 
   // Ex. 5.7
   def map[B](f: A => B): Stream[B] =
-    foldRight[Stream[B]](Empty) { (a,b) => cons(f (a), b) }
-  def filter(f: A => Boolean): Stream[A] =
-    foldRight[Stream[A]](Empty) { (a, b) => if (f(a)) cons(a,b) else b }
-  def append[B >: A](s: => Stream[B]): Stream[A] = {
-    val t = s map (_.asInstanceOf[A])
-    this match {
-      case Empty => t
-      case _ => foldRight[Stream[A]](t) { (a,b) => cons(a,b) }
-    }
-  }
-  // To make the return type Stream[A] the above maneuvers are necessary. The book solution has
-  // return type Stream[B] (which is fine) and is cleaner:
-  // def append[B>:A](s: => Stream[B]): Stream[B] = foldRight(s)((h,t) => cons(h,t))
-
+    foldRight(empty[B]){ (a, b) => cons(f(a), b)}
+  def filter(p: A => Boolean): Stream[A] =
+    foldRight(empty[A]){ (a,b) => if (p(a)) cons(a,b) else b }
+  def append[B>:A](b: => Stream[B]): Stream[B] =
+    foldRight(b)(cons)
   def flatMap[B](f: A => Stream[B]): Stream[B] =
-    foldRight[Stream[B]](Empty) { (a, b) => f(a) append b }
+    foldRight(empty[B]){ (a,b) => f(a) append b }
 
   // Ex. 5.14
   def startsWith[B](s: Stream[B]): Boolean = this zipAll s forAll {
