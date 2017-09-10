@@ -164,12 +164,8 @@ object Stream {
   }
 
   // Ex. 5.11
-  def unfold[A, S](z: S)(f: S => Option[(A, S)]): Stream[A] = {
-    f(z) match {
-      case Some((aa, ss)) => cons(aa, unfold(ss)(f))
-      case None => Empty
-    }
-  }
+  def unfold[A,S](z: S)(f: S => Option[(A,S)]): Stream[A] =
+    f(z) map { as => cons(as._1, unfold(as._2)(f)) } getOrElse empty[A]
 
   // Ex. 5.12
   def fibs2: Stream[Int] = unfold[Int, (Int,Int)]((0,1)) { case (a,b) => Some((a, (b, a+b))) }
