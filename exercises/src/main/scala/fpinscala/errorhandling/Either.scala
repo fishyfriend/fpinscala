@@ -66,3 +66,12 @@ object Either {
 sealed trait EitherPlusPlus[+E,+A]
 case class LeftPlusPlus[+E](get: List[E]) extends EitherPlusPlus[E, Nothing]
 case class RightPlusPlus[+A](get: A) extends EitherPlusPlus[Nothing, A]
+/* orElse, if called on a LeftPlusPlus, would have to preserve the object's
+existing error list. This only matters when the b argument is a LeftPlusPlus.
+Rather than returning the b argument verbatim, orElse would return a new LeftPlusPlus
+with the "inherited" errors appended to the error list from the b argument.
+sequence and traverse might continue to behave as they do now (meaning the first
+error encountered is the one reported) or they could "look at" the entire list and return
+a list of errors containing one error for each and every failure encountered
+during the traversal.
+ */
