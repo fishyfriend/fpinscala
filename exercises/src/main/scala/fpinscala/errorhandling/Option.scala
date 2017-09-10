@@ -56,13 +56,11 @@ object Option {
     a flatMap (aa => b map (bb => f(aa, bb)))
 
   // Ex. 4.4
-  def sequence[A](a: List[Option[A]]): Option[List[A]] = a match {
-    case Nil => None
-    case h::Nil => h map (List(_))
-    case h::t => map2(h,sequence(t))(_::_)
+  def sequence[A](a: List[Option[A]]): Option[List[A]] = {
+    if (a.isEmpty) Some(Nil) else {
+      a.head flatMap { h => sequence(a.tail) map { t => h :: t }}
+    }
   }
-  // This deviates from the textbook answer by returning `None` in the case where an
-  // empty list was passed, rather than `Some(Nil)` which is more literally correct.
 
   // Ex. 4.5
   def traverse[A, B](a: List[A])(f: A => Option[B]): Option[List[B]] = a match {
