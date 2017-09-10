@@ -168,8 +168,8 @@ object Stream {
     f(z) map { as => cons(as._1, unfold(as._2)(f)) } getOrElse empty[A]
 
   // Ex. 5.12
-  def fibs2: Stream[Int] = unfold[Int, (Int,Int)]((0,1)) { case (a,b) => Some((a, (b, a+b))) }
-  def from2(n: Int): Stream[Int] = unfold[Int,Int](n)(x => Some((n,n+1)))
-  def constant2[A](a: A): Stream[A] = unfold[A,A](a)(x=>Some((x,x)))
-  def ones2: Stream[Int] = unfold[Int,Int](1)(x=>Some((x,x)))
+  def fibs2: Stream[Int] = unfold((0,1)) { case (a,b) => Some((a, (b, a+b))) }
+  def from2(n: Int): Stream[Int] = unfold(n)(s => Some(n, n+1))
+  def constant2[A](a: A): Stream[A] = unfold(())(_=>Some((a,())))
+  def ones2: Stream[Int] = unfold(())(_=>Some((1,())))
 }
