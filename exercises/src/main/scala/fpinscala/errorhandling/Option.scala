@@ -48,9 +48,8 @@ object Option {
   // Ex. 4.2
   def variance(xs: Seq[Double]): Option[Double] =
     mean(xs) flatMap { m =>
-      try { Some(xs.map(x => math.pow(x - m, 2))) }
-      catch { case _: Throwable => None }
-    } flatMap (mean(_))
+      mean(xs map { x => Math.pow(x - m, 2) })
+    }
 
   // Ex. 4.3
   def map2[A,B,C](a: Option[A], b: Option[B])(f: (A, B) => C): Option[C] =
