@@ -2,7 +2,6 @@ package fpinscala.laziness
 
 import Stream._
 sealed trait Stream[+A] {
-
   def foldRight[B](z: => B)(f: (A, => B) => B): B = // The arrow `=>` in front of the argument type `B` means that the function `f` takes its second argument by name and may choose not to evaluate it.
     this match { case Cons(h,t) => f(h(), t().foldRight(z)(f)) // If `f` doesn't evaluate its second argument, the recursion never occurs.
       case _ => z
@@ -35,6 +34,7 @@ sealed trait Stream[+A] {
       case Empty => Empty
       case Cons(h, t) => cons(h(), t().take(n-1))
   } }
+
   def drop(n: Int): Stream[A] = {
     @annotation.tailrec
     def go(s: => Stream[A], m: Int): Stream[A] = if (m < 1) s else { s match {
@@ -57,6 +57,8 @@ sealed trait Stream[+A] {
     case Empty => true
     case Cons(h, t) => p(h()) && (t() forAll p)
   }
+  // better (book solution):
+  final def forAll2(p: A => Boolean): Boolean = foldRight(true){ (a,b) => p(a) && b }
 
   // Ex. 5.5
   def takeWhile2(p:A=>Boolean):Stream[A] = foldRight[Stream[A]](Empty) { (a,b) =>
