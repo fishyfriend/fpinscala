@@ -147,12 +147,7 @@ object Stream {
   val ones: Stream[Int] = Stream.cons(1, ones)
 
   // Ex. 5.8
-  def constant[A](a: A): Stream[A] = cons(a, constant(a))
-  // Book solution is marginally more efficient
-  //def constant[A](a: A): Stream[A] = {
-    //lazy val tail: Stream[A] = Cons(() => a, () => tail) 
-    //tail
-  //}
+  def constant[A](a: A): Stream[A] = cons(a, constant(a)) // Book solution is more efficient
 
   // Ex. 5.9
   def from(n: Int): Stream[Int] = cons(n, from(n+1))
