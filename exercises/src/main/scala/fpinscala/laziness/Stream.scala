@@ -79,19 +79,11 @@ sealed trait Stream[+A] {
     foldRight(empty[B]){ (a,b) => f(a) append b }
 
   // Ex. 5.14
-  def startsWith[B](s: Stream[B]): Boolean = this zipAll s forAll {
-    case (Some(a), Some(b)) if a == b => true
-    case (Some(a), None) => true
-    case _ => false
-  }
-  // book solution is better: it cleanly separates the equality check from iterating to
-  // the end of the 2nd stream
-  def startsWith2[B](s: Stream[B]): Boolean = this.zipAll(s)
-                                                  .takeWhile { case (a,b) => b.isDefined }
-                                                  .forAll { case (a,b) => a==b }
+  def startsWith[A](a: Stream[A]): Boolean =
+    this.zipAll(a).takeWhile(_._2.isDefined).forAll { case (a,b) => a == b }
 
   // Ex. 5.13
-  def map2[B](f: A => B): Stream[B] = unfold[B,Stream[A]](this){
+  def map2[B](f: A => B): Stream[B] = unfold(this){
     case Cons(h,t) => Some((f(h()), t()))
     case _ => None
   }
@@ -121,8 +113,8 @@ sealed trait Stream[+A] {
   // Ex. 5.15
   def tails: Stream[Stream[A]] = unfold(this) {
     case Empty => None
-    case s@Cons(_,t) => Some(s -> t())
-  }
+    case Cons(h,t) => Some(Cons(h,t) -> t())
+  } append Stream(empty)
 
   // Ex. 5.16
   def scanRight[B](z: B)(f: (A, => B) => B): Stream[B] = ??? //TODO
