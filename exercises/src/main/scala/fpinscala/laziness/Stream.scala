@@ -110,6 +110,20 @@ sealed trait Stream[+A] {
     case (Cons(h1,t1), Cons(h2,t2)) => Some(((Some(h1()), Some(h2())), (t1(), t2())))
   }
 
+  // Before Ex. 5.14-15 -- using only methods implemented so far
+  def hasSubsequence[B >: A](sub: Stream[B]): Boolean = {
+    val supSubs = for {
+        sup <- unfold(this) {
+          case Empty => None
+          case Cons(h, t) => Some(Cons(h, t) -> t())
+        }
+      } yield sup zipAll sub takeWhile (_._2.isDefined)
+    supSubs exists { _.forAll { case (a,b) => a == b } }
+  }
+  // After Ex. 5.14-15 -- answer from book
+  def hasSubsequence2[B >: A](s: Stream[B]): Boolean =
+    tails exists (_ startsWith s)
+
   // Ex. 5.15
   def tails: Stream[Stream[A]] = unfold(this) {
     case Empty => None
