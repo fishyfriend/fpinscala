@@ -24,11 +24,13 @@ sealed trait Either[+E,+A] {
   // Ex. 4.7
   def sequence[E, A](as: List[Either[E, A]]): Either[E, List[A]] = traverse(as)(a => a)
 
-  def traverse[E, A, B](as: List[A])(f: A => Either[E, B]): Either[E, List[B]] = {
-    case Nil => Right(Nil)
-    case h :: t => (f(h) map2 traverse(t)(f(_))) { (a, as) => a :: as }
+  def traverse[E, A, B](as: List[A])(f: A => Either[E, B]): Either[E, List[B]] =
+    as match {
+      case Nil => Right(Nil)
+      case h :: t => (f(h) map2 traverse(t)(f(_))) { (a, as) => a :: as }
+    }
   }
-}
+
 case class Left[+E](get: E) extends Either[E,Nothing]
 case class Right[+A](get: A) extends Either[Nothing,A]
 

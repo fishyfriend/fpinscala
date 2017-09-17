@@ -80,7 +80,7 @@ object List { // `List` companion object. Contains functions for creating and wo
   }
 
   // Exercise 3.6
-  def init[A](l: List[A]): List[A] = {
+  def init[A](l: List[A]): List[A] = l match {
     case Nil => throw new UnsupportedOperationException("can't take init of empty list")
     case Cons(h,Nil) => Nil
     case Cons(h,t) => Cons(h,init(t))
