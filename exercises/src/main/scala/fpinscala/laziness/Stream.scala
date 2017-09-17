@@ -131,7 +131,27 @@ sealed trait Stream[+A] {
   } append Stream(empty)
 
   // Ex. 5.16
-  def scanRight[B](z: B)(f: (A, => B) => B): Stream[B] = ??? //TODO
+  //
+  // It is not possible to implement `scanRight` using `unfold` and have the
+  // resulting stream be traversable in linear time. The inner function to
+  // `unfold` can't "look ahead" to the later elements of the stream; but in the
+  // result stream, the value of each element depends on the value of the
+  // following element. Thus, getting the value of a single element requires
+  // calculation of all later elements. Intermediate values can't be reused
+  // since there's no way to give later elements access to earlier ones.
+  //
+  // One could maybe cheat by having the first iteration of the inner
+  // function calculate the whole result in some manner that satisfies the
+  // requirement of linear traversal, hold this result in the state,
+  // and let the subsequent iterations of the function simply pop the pre-
+  // calculated values off the state.
+  //
+  def scanRight[B](z: B)(f: (A, => B) => B): Stream[B] =
+    foldRight(Stream(z)) { (a,b) =>
+      lazy val b_ = b
+      lazy val f_ = f(a, b_.headOption.get)
+      cons(f_, b_)
+    }
 }
 
 case object Empty extends Stream[Nothing]
