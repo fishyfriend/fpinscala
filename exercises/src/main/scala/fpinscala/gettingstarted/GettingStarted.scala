@@ -34,15 +34,14 @@ object MyModule {
     acc
   }
 
-  // Exercise 1: Write a function to compute the nth fibonacci number
+  // Exercise 2.1: Write a function to compute the nth fibonacci number
 
   def fib(n: Int): Int = {
-    import Math.max
     @annotation.tailrec
-    def go(a: Int, b: Int, c: Int): Int =
-      if (c == 1) a
-      else go(b, a + b, c - 1)
-    go(0, 1, max(n, 1))
+    def go(a: Int, b: Int, count: Int): Int =
+      if (count == 1) a
+      else go(b, a + b, count - 1)
+    go(0, 1, n)
   }
 
   // This definition and `formatAbs` are very similar..
