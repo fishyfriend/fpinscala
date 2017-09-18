@@ -20,7 +20,7 @@ sealed trait Stream[+A] {
   // Ex. 5.1
   def toList: List[A] = foldRight[List[A]](Nil) { (a, as) => a::as }
   // stack-safe solution, see answers
-  def toList2: List[A] = {
+  def toList_2: List[A] = {
     @annotation.tailrec
     def go(s: Stream[A], l: List[A]): List[A] = s match {
       case Empty => l.reverse
@@ -59,10 +59,11 @@ sealed trait Stream[+A] {
     case Cons(h, t) => p(h()) && (t() forAll p)
   }
   // better (book solution):
-  final def forAll2(p: A => Boolean): Boolean = foldRight(true){ (a,b) => p(a) && b }
+  final def forAll_2(p: A => Boolean): Boolean =
+    foldRight(true){ (a,b) => p (a) && b }
 
   // Ex. 5.5
-  def takeWhile2(p:A=>Boolean):Stream[A] =
+  def takeWhileViaFoldRight(p:A=>Boolean):Stream[A] =
     foldRight[Stream[A]](Empty) { (a,b) => if (p(a)) cons(a,b) else Empty }
 
   // Ex. 5.6
@@ -83,16 +84,16 @@ sealed trait Stream[+A] {
     this.zipAll(a).takeWhile(_._2.isDefined).forAll { case (a,b) => a == b }
 
   // Ex. 5.13
-  def map2[B](f: A => B): Stream[B] = unfold(this){
+  def mapViaUnfold[B](f: A => B): Stream[B] = unfold(this){
     case Cons(h,t) => Some((f(h()), t()))
     case _ => None
   }
-  def take2(n: Int): Stream[A] = unfold((n, this)){
+  def takeViaUnfold(n: Int): Stream[A] = unfold((n, this)){
     case (m, _) if m <= 0 => None
     case (_, Empty) => None
     case (m, Cons(h,t)) => Some((h(), (m-1, t())))
   }
-  def takeWhile3(p: A => Boolean): Stream[A] = unfold(this){
+  def takeWhileViaUnfold(p: A => Boolean): Stream[A] = unfold(this){
     case Cons(h,t) =>
       val hh = h()
       if (p(hh)) Some((hh, t())) else None
@@ -194,8 +195,12 @@ object Stream {
     f(z) map { as => cons(as._1, unfold(as._2)(f)) } getOrElse empty[A]
 
   // Ex. 5.12
-  def fibs2: Stream[Int] = unfold((0,1)) { case (a,b) => Some((a, (b, a+b))) }
-  def from2(n: Int): Stream[Int] = unfold(n)(s => Some(n, n+1))
-  def constant2[A](a: A): Stream[A] = unfold(())(_=>Some((a,())))
-  def ones2: Stream[Int] = unfold(())(_=>Some((1,())))
+  def fibsViaUnfold: Stream[Int] =
+    unfold((0,1)) { case (a,b) => Some((a, (b, a+b))) }
+  def fromViaUnfold(n: Int): Stream[Int] =
+    unfold(n)(s => Some(n, n+1))
+  def constantViaUnfold[A](a: A): Stream[A] =
+    unfold(())(_=>Some((a,())))
+  def onesViaUnfold: Stream[Int] =
+    unfold(())(_=>Some((1,())))
 }
