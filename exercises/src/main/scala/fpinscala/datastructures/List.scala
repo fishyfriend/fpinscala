@@ -138,32 +138,34 @@ object List { // `List` companion object. Contains functions for creating and wo
   }
 
   // Exercise 3.11
-  def sum3(l: List[Int]): Int = foldLeft(l, 0)(_ + _)
-  def product3(l: List[Double]): Double = foldLeft(l, 1.0)(_ * _)
-  def length2[A](l: List[A]): Int = foldLeft(l, 0)((b, a) => b + 1)
+  def sumViafoldLeft(l: List[Int]): Int = foldLeft(l, 0)(_ + _)
+  def productViafoldLeft(l: List[Double]): Double = foldLeft(l, 1.0)(_ * _)
+  def lengthViafoldLeft[A](l: List[A]): Int = foldLeft(l, 0)((b, a) => b + 1)
 
   // Exercise 3.12
   def reverse[A](l: List[A]): List[A] = foldLeft(l, Nil:List[A])((b, a) => Cons(a, b))
 
   // Exercise 3.13
-  def foldLeft2[A,B](l: List[A], z: B)(f: (B,A) => B): B =
+  def foldLeftViaFoldRight[A,B](l: List[A], z: B)(f: (B,A) => B): B =
     foldRight(l, (b:B) => b)((a,g) => bb => g(f(bb, a)))(z)
-  def foldRight2[A,B](l: List[A], z: B)(f: (A,B) => B): B =
+  def foldRightViafoldLeft[A,B](l: List[A], z: B)(f: (A,B) => B): B =
     foldLeft(reverse(l), z)((b,a) => f(a,b))
-  def foldRight3[A,B](l: List[A], z: B)(f: (A,B) => B): B =
+  def foldRightViaFoldLeft_2[A,B](l: List[A], z: B)(f: (A,B) => B): B =
     foldLeft(l, (b:B) => b)((g,a) => bb => g(f(a, bb)))(z)
 
   // Exercise 3.14
-  def append2[A](a1: List[A], a2: List[A]): List[A] = foldRight(a1, a2)(Cons(_, _))
+  def appendViaFoldRight[A](a1: List[A], a2: List[A]): List[A] =
+    foldRight(a1, a2)(Cons(_, _))
 
   // Exercise 3.15
-  def flatten[A](l: List[List[A]]): List[A] = foldRight(l, Nil:List[A])(append2)
+  def flatten[A](l: List[List[A]]): List[A] =
+    foldRight(l, Nil:List[A])(appendViaFoldRight)
 
   // Exercise 3.16
   def add1(l: List[Int]): List[Int] = foldRight(l, Nil: List[Int])((a,b)=>Cons(a+1,b))
 
   // Exercise 3.17
-  def toS(l: List[Double]): List[String] =
+  def toStrings(l: List[Double]): List[String] =
     foldRight(l, Nil: List[String])((a,b)=>Cons(a.toString,b))
 
   // Exercise 3.18
@@ -180,14 +182,14 @@ object List { // `List` companion object. Contains functions for creating and wo
     foldRight(as, Nil:List[B]) { (a,b) => append(f(a), b) }
 
   // Exercise 3.21
-  def filter2[A](as:List[A])(f: A=>Boolean): List[A] =
+  def filterViaFlatMap[A](as:List[A])(f: A=>Boolean): List[A] =
     flatMap(as)(a => if (f(a)) List(a) else Nil)
 
   // Exercise 3.22
-  def addEls(l1: List[Int], l2: List[Int]): List[Int] = (l1, l2) match {
+  def addElements(l1: List[Int], l2: List[Int]): List[Int] = (l1, l2) match {
     case (Nil, _) => l2 // n.b. the text has `Nil` here
     case (_, Nil) => l1 // and here
-    case (Cons(h1, t1), Cons(h2, t2)) => Cons(h1+h2, addEls(t1, t2))
+    case (Cons(h1, t1), Cons(h2, t2)) => Cons(h1+h2, addElements(t1, t2))
   }
 
   // Exercise 3.23
