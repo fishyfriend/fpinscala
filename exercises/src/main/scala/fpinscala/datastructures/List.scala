@@ -199,11 +199,15 @@ object List { // `List` companion object. Contains functions for creating and wo
     }
 
   // Exercise 3.24
-  // variation on the text solution
+  @annotation.tailrec
+  def startsWith[A](a: List[A], b: List[A]): Boolean = (a,b) match {
+    case (_, Nil) => true
+    case (Nil, _) => false
+    case (Cons(x,xs), Cons(y,ys)) => x == y && startsWith(xs, ys)
+  }
+
   @annotation.tailrec
   def hasSubsequence[A](sup: List[A], sub: List[A]): Boolean = {
-    def startsWith[A](a:List[A], b:List[A]):Boolean =
-      length(b) == length(filter(zipWith(a, b)(_ == _))(_ == true))
     sup match {
       case Nil => sub == Nil
       case Cons(_, t) => startsWith(sup, sub) || hasSubsequence(t, sub)
