@@ -20,26 +20,22 @@ sealed trait Either[+E,+A] {
   }
   def map2[EE >: E, B, C](b: Either[EE, B])(f: (A, B) => C): Either[EE, C] =
     for (aa <- this; bb <- b) yield f(aa, bb)
-
-  // Ex. 4.7
-  def sequence[E, A](as: List[Either[E, A]]): Either[E, List[A]] = traverse(as)(a => a)
-
-  def traverse[E, A, B](as: List[A])(f: A => Either[E, B]): Either[E, List[B]] =
-    as match {
-      case Nil => Right(Nil)
-      case h :: t => (f(h) map2 traverse(t)(f(_))) { (a, as) => a :: as }
-    }
-  }
+}
 
 case class Left[+E](get: E) extends Either[E,Nothing]
 case class Right[+A](get: A) extends Either[Nothing,A]
 
 object Either {
-  def traverse[E,A,B](es: List[A])(f: A => Either[E, B]): Either[E, List[B]] = ???
+  // Ex. 4.7
+  def traverse[E,A,B](es: List[A])(f: A => Either[E, B]): Either[E, List[B]] =
+    es match {
+      case Nil => Right(Nil)
+      case h :: t => (f(h) map2 traverse(t)(f(_))) { (a, as) => a :: as }
+    }
 
-  def sequence[E,A](es: List[Either[E,A]]): Either[E,List[A]] = ???
+  def sequence[E, A](es: List[Either[E, A]]): Either[E, List[A]] = traverse(es)(a => a)
 
-  def mean(xs: IndexedSeq[Double]): Either[String, Double] = 
+  def mean(xs: IndexedSeq[Double]): Either[String, Double] =
     if (xs.isEmpty) 
       Left("mean of empty list!")
     else 
