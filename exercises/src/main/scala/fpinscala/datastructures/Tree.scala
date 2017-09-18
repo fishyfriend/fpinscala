@@ -36,9 +36,9 @@ object Tree {
     case Leaf(a) => f(a)
     case Branch(l, r) => g(fold(l)(f)(g), fold(r)(f)(g))
   }
-  def size2[A](t: Tree[A]): Int = fold(t)(a=>1)(_ + _ + 1)
-  def maximum2(t: Tree[Int]): Int = fold(t)(a=>a)(_ max _)
-  def depth2[A](t: Tree[A]): Int = fold(t)(a=>0)((l,r)=>(l max r) + 1)
-  def map2[A,B](t: Tree[A])(f: A => B): Tree[B] =
+  def sizeViaFold[A](t: Tree[A]): Int = fold(t)(a=>1)(_ + _ + 1)
+  def maximumViaFold(t: Tree[Int]): Int = fold(t)(a=>a)(_ max _)
+  def depthViaFold[A](t: Tree[A]): Int = fold(t)(a=>0)((l,r)=>(l max r) + 1)
+  def mapViaFold[A,B](t: Tree[A])(f: A => B): Tree[B] =
     fold[A,Tree[B]] (t) (a => Leaf(f(a))) ((l,r)=>Branch(l,r))
 }
