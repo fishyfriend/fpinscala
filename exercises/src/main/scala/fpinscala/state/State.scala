@@ -39,7 +39,7 @@ object RNG {
   // Ex. 6.2
   def double(rng: RNG): (Double, RNG) = {
     val (n, rng2) = nonNegativeInt(rng)
-    (-n.toDouble / -Int.MinValue, rng2)
+    (-(n.toDouble / Int.MinValue), rng2)
   }
 
   // Ex. 6.3
@@ -54,14 +54,18 @@ object RNG {
   }
   def double3(rng: RNG): ((Double,Double,Double), RNG) = {
     var r = rng
-    var ds = new Array[Double](3)
-    for (i <- 0 to 3) (r, ds(i)) = double(r)
+    val ds = new Array[Double](3)
+    for (i <- 0 to 3) {
+      val (d, r2) = double(r)
+      ds(i) = d
+      r = r2
+    }
     ((ds(0), ds(1), ds(2)), r)
   }
 
   // Ex. 6.4
   def ints(count: Int)(rng: RNG): (List[Int], RNG) = {
-    if (count == 0) (Nil, rng.nextInt._2)
+    if (count == 0) (Nil, rng)
     else {
       val (n, rng2) = rng.nextInt
       val (ns, rng3) = ints(count - 1)(rng2)
@@ -70,7 +74,8 @@ object RNG {
   }
 
   // Ex. 6.5
-  def double2: Rand[Double] = map(nonNegativeInt)(-_.toDouble / -Int.MinValue)
+  def doubleViaMap: Rand[Double] =
+    map(nonNegativeInt)(n => -(n.toDouble / Int.MinValue))
 
   // Ex. 6.6
   def map2[A,B,C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] = { rng =>
@@ -85,13 +90,13 @@ object RNG {
     val outer = fs.foldRight(init) { (f, acc) => map2(f, acc)(_ :: _) }
     outer(rng)
   }
-  def ints2(count: Int)(rng: RNG): (List[Int], RNG) =
-    sequence(List.fill(count)(_.nextInt)).apply(rng)
+  def intsViaSequence(count: Int)(rng: RNG): (List[Int], RNG) =
+    sequence(List.fill(count)((r: RNG) => r.nextInt)).apply(rng)
 
   // Ex. 6.8
   def flatMap[A,B](f: Rand[A])(g: A => Rand[B]): Rand[B] = { rng =>
     val (a, rng2) = f(rng)
-    val (b, rng3) = g(a)(rng3)
+    val (b, rng3) = g(a)(rng2)
     (b, rng3)
   }
   def nonNegativeLessThan(n: Int): Rand[Int] =
